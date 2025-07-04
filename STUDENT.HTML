@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تقييم الطالب</title>
+  <style>
+    body { font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 20px; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+    h2 { text-align: center; }
+    input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 4px; border: 1px solid #ccc; }
+    .subject-container { margin-bottom: 10px; }
+    .result { margin-top: 20px; padding: 15px; font-weight: bold; text-align: center; border-radius: 5px; }
+    .pass { background: #d4edda; color: #155724; }
+    .fail { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>تقييم الطالب</h2>
+    <label>اسم الطالب:</label>
+    <input type="text" id="studentName" placeholder="أدخل اسمك" required>
+
+    <label>العمر:</label>
+    <input type="number" id="studentAge" placeholder="أدخل عمرك" required>
+
+    <div id="subjects"></div>
+
+    <button onclick="addSubject()">إضافة مادة</button>
+    <button onclick="calculateResult()">حساب النتيجة</button>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    let subjectCount = 0;
+
+    function addSubject() {
+      subjectCount++;
+      const subjectsDiv = document.getElementById('subjects');
+      const subjectContainer = document.createElement('div');
+      subjectContainer.classList.add('subject-container');
+      subjectContainer.innerHTML = `
+        <label>المادة ${subjectCount}:</label>
+        <input type="text" placeholder="اسم المادة" class="subjectName" required>
+        <input type="text" placeholder="اسم المدرس" class="teacherName" required>
+        <input type="number" placeholder="درجة المادة" class="subjectGrade" required>
+      `;
+      subjectsDiv.appendChild(subjectContainer);
+    }
+
+    function calculateResult() {
+      const name = document.getElementById('studentName').value.trim();
+      const age = document.getElementById('studentAge').value.trim();
+      const subjectNames = document.querySelectorAll('.subjectName');
+      const teacherNames = document.querySelectorAll('.teacherName');
+      const subjectGrades = document.querySelectorAll('.subjectGrade');
+
+      if (!name || !age || subjectNames.length === 0) {
+        alert('يرجى ملء جميع الحقول وإضافة مواد!');
+        return;
+      }
+
+      let pass = true;
+      let total = 0;
+      let subjectsInfo = '';
+
+      subjectGrades.forEach((gradeInput, i) => {
+        const grade = parseFloat(gradeInput.value);
+        const subject = subjectNames[i].value;
+        const teacher = teacherNames[i].value;
+
+        if (isNaN(grade)) {
+          alert(يرجى إدخال درجة صحيحة للمادة ${subject || i + 1});
+          pass = false;
+          return;
+        }
+
+        total += grade;
+        subjectsInfo += - ${subject} (المدرس: ${teacher}): ${grade} درجة\n;
+        if (grade < 50) pass = false;
+      });
+
+      const avg = (total / subjectGrades.length).toFixed(2);
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `
+        الطالب: ${name} (العمر: ${age})<br>
+        <pre>${subjectsInfo}</pre>
+        المعدل: ${avg}<br>
+        النتيجة: ${pass ? '✅ ناجح' : '❌ راسب'}
+      `;
+      resultDiv.className = pass ? 'result pass' : 'result fail';
+    }
+  </script>
+</body>
+</html>
